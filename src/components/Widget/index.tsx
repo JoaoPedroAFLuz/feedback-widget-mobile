@@ -1,20 +1,34 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { ChatTeardropDots } from 'phosphor-react-native';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { theme } from '../../theme';
 import { feedbackTypes } from '../../utils/feedbackTypes';
 import { Form } from '../Form';
+import { Options } from '../Options';
+import { Success } from '../Success';
 import { styles } from './styles';
 
 export type FeedbackType = keyof typeof feedbackTypes;
 
 function Widget() {
+  const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   function handleOpen() {
     bottomSheetRef.current?.expand();
+  }
+
+  function handleRestartFeedback() {
+    setFeedbackType(null);
+    setFeedbackSent(false);
+  }
+
+  function handleFeedbackSent() {
+    setFeedbackSent(true);
   }
 
   return (
@@ -28,7 +42,6 @@ function Widget() {
           weight="bold"
           color={theme.colors.text_on_brand_color}
         />
-
       </TouchableOpacity>
 
       <BottomSheet
@@ -37,11 +50,34 @@ function Widget() {
         backgroundStyle={styles.modal}
         handleIndicatorStyle={styles.indicator}
       >
-        <Form
-          feedbackType="BUG"
-        />
+        {
+          !feedbackSent
+            ? (
+              <>
+                {
+                  !feedbackType
+                    ? (
+                      <Options
+                        onFeedbackTypeChanged={setFeedbackType}
+                      />
+                    )
+                    : (
+                      <Form
+                        feedbackType={feedbackType}
+                        onFeedbackCanceled={() => handleRestartFeedback()}
+                        onFeedbackSent={() => handleFeedbackSent()}
+                      />
+                    )
+                }
+              </>
+            )
+            : (
+              <Success
+                onSendAnotherFeedback={() => handleRestartFeedback()}
+              />
+            )
+        }
       </BottomSheet>
-
     </>
   );
 }

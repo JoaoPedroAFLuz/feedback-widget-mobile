@@ -4,7 +4,7 @@ import { theme } from '../../theme';
 import { styles } from './styles';
 
 interface Props {
-  screenshot: string;
+  screenshot: string | null;
   onTakeShot: () => void;
   onRemoveShot: () => void;
 }
@@ -18,7 +18,7 @@ export function ScreenshotButton({ screenshot, onTakeShot, onRemoveShot }: Props
       {
         screenshot
           ? (
-            <View>
+            <>
               <Image
                 style={styles.image}
                 source={{ uri: screenshot }}
@@ -30,7 +30,7 @@ export function ScreenshotButton({ screenshot, onTakeShot, onRemoveShot }: Props
                 weight="fill"
                 style={styles.removeIcon}
               />
-            </View>
+            </>
           )
           : (
             <Camera
